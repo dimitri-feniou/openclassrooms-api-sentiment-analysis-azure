@@ -1,31 +1,55 @@
-name: Test API
+name: Test API Sentiment Analysis
 
 on:
   push:
     branches:
-      - master
-      - api-sentiment
+      - main
   pull_request:
     branches:
-      - master
-      - api-sentiment
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      # Définir les chemins relatifs pour les tests
+      MODEL_URI: models/mlflow_model/LogisticRegression_model
+      PCA_PATH: models/pca_model.pkl
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Étape 1 : Vérifier le code source
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10.15
+    # Étape 2 : Configurer Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          pip install -r api_sentiment_analysis/requirements.txt
+    # Étape 3 : Installer les dépendances
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run tests
-        run: |
-          pytest api_sentiment_analysis/tests/ --maxfail=5 --disable-warnings
+    # Étape 4 : Créer les répertoires nécessaires pour les tests
+    - name: Set up directories
+      run: |
+        mkdir -p models/mlflow_model/LogisticRegression_model
+        touch models/mlflow_model/LogisticRegression_model/model.pkl
+        echo "Mock PCA file" > models/pca_model.pkl
+
+    # Étape 5 : Lancer les tests avec pytest
+    - name: Run Tests
+      run: |
+        pytest tests/ --maxfail=5 --disable-warnings
+
+    # Étape 6 : Sauvegarder les rapports de test (optionnel)
+    - name: Upload Test Results
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: pytest-results.xml

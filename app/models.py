@@ -9,6 +9,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../models"))
 pca_path = os.path.join(BASE_DIR, "pca_model.pkl")
 model_uri = os.path.join(BASE_DIR, "mlflow_model/LogisticRegression_model/")
+
 def load_model():
     """
     Load the tokenizer, DistilBERT model, and MLflow sentiment analysis model.

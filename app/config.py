@@ -1,2 +1,8 @@
-MODEL_URI = "/home/dimitri/Documents/openclassrooms/projet_7/mlruns/176363675740271849/159096feaf6a44db8ee99f55e14a4148/artifacts/LogisticRegression_model"
-PCA_PATH = "models/pca_model.pkl"
+import os
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../models"))
+
+MODEL_URI = os.getenv(
+    "MODEL_URI", os.path.join(BASE_DIR, "mlflow_model/LogisticRegression_model")
+)
+PCA_PATH = os.getenv("PCA_PATH", os.path.join(BASE_DIR, "pca_model.pkl"))

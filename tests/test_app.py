@@ -125,7 +125,7 @@ def test_home_route_post_valid_text(client):
 
     # Check for sentiment result and key template elements
     assert b"Analyse de Sentiment" in response.data
-    assert b"Sentiment:" in response.data
+    assert b"<strong>Sentiment :</strong>" in response.data
     assert b"positif" in response.data or b"negatif" in response.data
 
 
@@ -144,6 +144,15 @@ def test_load_model_cuda_availability(mock_load_model):
 
         load_model()
         mock_load_model.assert_called_once()
+
+
+@patch("mlflow.sklearn.load_model")
+def test_model_loading_paths(mock_load_model):
+    mock_load_model.return_value = MagicMock()
+    from app.models import load_model
+
+    model = load_model()
+    assert model is not None
 
 
 def test_predict_sentiment_error_handling(mock_models):
