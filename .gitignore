@@ -1,0 +1,5 @@
+.pytest_cache
+__pycache__
+.vscode
+resume_projet.md
+app/__pycache__
