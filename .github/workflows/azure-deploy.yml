@@ -19,17 +19,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10.15"
+          python-version: "3.10"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install joblib scikit-learn
 
       - name: Create Mock PCA File
         run: |
-          mkdir -p models
-          echo "Mock PCA file" > models/pca_model.pkl
+          mkdir -p api_sentiment_analysis/models
+          python -c "import joblib; import numpy as np; pca = np.random.RandomState(42).random((10, 10)); joblib.dump(pca, 'api_sentiment_analysis/models/pca_model.pkl')"
 
       - name: Run Tests
         run: |

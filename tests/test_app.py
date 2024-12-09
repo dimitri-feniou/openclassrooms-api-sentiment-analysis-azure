@@ -3,7 +3,8 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-
+import joblib
+import numpy as np
 import pytest
 import torch
 from unittest.mock import MagicMock, patch
@@ -18,18 +19,18 @@ def setup_test_environment():
     """Mock model files if not available in CI/CD environment"""
     import os
 
-    if not os.path.exists(
-        "api_sentiment_analysis/models/mlflow_model/LogisticRegression_model"
-    ):
-        print("Mocking models for CI environment...")
-        os.makedirs("api_sentiment_analysis/models/mlflow_model", exist_ok=True)
-        with open(
-            "api_sentiment_analysis/models/mlflow_model/LogisticRegression_model", "w"
-        ) as f:
-            f.write("mock model")
-    if not os.path.exists("api_sentiment_analysis/models/pca_model.pkl"):
-        with open("api_sentiment_analysis/models/pca_model.pkl", "w") as f:
-            f.write("mock pca")
+    # Ensure models directory exists
+    os.makedirs("api_sentiment_analysis/models/mlflow_model", exist_ok=True)
+
+    # Create mock MLflow model file
+    with open(
+        "api_sentiment_analysis/models/mlflow_model/LogisticRegression_model", "w"
+    ) as f:
+        f.write("mock model")
+
+    # Create mock PCA file using joblib
+    pca_mock = np.random.RandomState(42).random((10, 10))
+    joblib.dump(pca_mock, "api_sentiment_analysis/models/pca_model.pkl")
 
 
 def test_template_debug(client):
