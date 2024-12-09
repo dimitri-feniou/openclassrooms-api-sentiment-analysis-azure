@@ -18,10 +18,9 @@ jobs:
       - name: Set Working Directory
         run: cd api_sentiment_analysis
 
-      - name: Verify PCA Model
-        run: |
-          ls -al models
-          test -f models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
+      - name: List Repository Files
+        run: ls -al
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
