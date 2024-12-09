@@ -36,10 +36,10 @@ jobs:
         working-directory: ./api_sentiment_analysis
 
       # Étape 5 : Vérification des artefacts nécessaires
-      - name: Check for Model Files
+      - name: Verify Models
         run: |
-          test -f models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
-          test -d models/mlflow_model/LogisticRegression_model || (echo "MLflow model folder is missing!" && exit 1)
+          test -f api_sentiment_analysis/models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
+          test -d api_sentiment_analysis/models/mlflow_model || (echo "MLflow model folder is missing!" && exit 1)
 
       # Étape 6 : Exécuter les tests
       - name: Run Tests
