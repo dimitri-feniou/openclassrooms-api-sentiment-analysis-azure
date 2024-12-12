@@ -27,31 +27,42 @@ jobs:
         with:
           python-version: "3.10"
 
-      # Étape 4 : Installation des dépendances sans environnement virtuel
+      # Étape 4 : Création et activation d'un environnement virtuel
+      - name: Create Virtual Environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+        working-directory: ./api_sentiment_analysis
+
+      # Étape 5 : Installation des dépendances
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r api_sentiment_analysis/requirements.txt
+          source venv/bin/activate
+          pip install -r requirements.txt
           pip install joblib scikit-learn
+        working-directory: ./api_sentiment_analysis
 
-      # Étape 5 : Vérification des modèles et fichiers nécessaires
+      # Étape 6 : Vérification des modèles et fichiers nécessaires
       - name: Verify Models
         run: |
-          test -f api_sentiment_analysis/models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
-          test -d api_sentiment_analysis/models/mlflow_model || (echo "MLflow model folder is missing!" && exit 1)
+          test -f models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
+          test -d models/mlflow_model || (echo "MLflow model folder is missing!" && exit 1)
+        working-directory: ./api_sentiment_analysis
 
-      # Étape 6 : Exécution des tests unitaires
+      # Étape 7 : Exécution des tests unitaires
       - name: Run Tests
         run: |
-          pytest api_sentiment_analysis/tests/ --maxfail=5 --disable-warnings
-
-      # Étape 7 : Nettoyage des fichiers temporaires
+          source venv/bin/activate
+          pytest tests/ --maxfail=5 --disable-warnings
+        working-directory: ./api_sentiment_analysis
       - name: Clean Temporary Files
         run: |
           find . -name "__pycache__" -exec rm -rf {} +
           find . -name "*.pyc" -exec rm -rf {} +
           find . -name "*.pyo" -exec rm -rf {} +
-
+          rm -rf venv
+        working-directory: ./api_sentiment_analysis
       # Étape 8 : Déploiement sur Azure App Service
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
