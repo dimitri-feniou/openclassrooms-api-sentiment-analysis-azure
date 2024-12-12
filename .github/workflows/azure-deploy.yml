@@ -27,16 +27,16 @@ jobs:
         with:
           python-version: "3.10"
 
-      # Étape 4 : Création et activation d'un environnement virtuel
-      - name: Create Virtual Environment
+      # Étape 4 : Création et activation d'un environnement virtuel pour les tests
+      - name: Create Virtual Environment for Tests
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
         working-directory: ./api_sentiment_analysis
 
-      # Étape 5 : Installation des dépendances
-      - name: Install Dependencies
+      # Étape 5 : Installation des dépendances pour les tests
+      - name: Install Test Dependencies
         run: |
           source venv/bin/activate
           pip install -r requirements-test.txt
@@ -56,6 +56,8 @@ jobs:
           source venv/bin/activate
           pytest tests/ --maxfail=5 --disable-warnings
         working-directory: ./api_sentiment_analysis
+
+      # Étape 8 : Nettoyage des fichiers temporaires
       - name: Clean Temporary Files
         run: |
           find . -name "__pycache__" -exec rm -rf {} +
@@ -63,7 +65,17 @@ jobs:
           find . -name "*.pyo" -exec rm -rf {} +
           rm -rf venv
         working-directory: ./api_sentiment_analysis
-      # Étape 8 : Déploiement sur Azure App Service
+
+      # Étape 9 : Création d'un nouvel environnement virtuel pour le déploiement
+      - name: Create Deployment Virtual Environment (antenv)
+        run: |
+          python -m venv antenv
+          source antenv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./api_sentiment_analysis
+
+      # Étape 10 : Déploiement sur Azure App Service
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
