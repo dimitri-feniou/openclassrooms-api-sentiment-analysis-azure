@@ -9,4 +9,4 @@ joblib==1.4.2
 nltk==3.7
 
 # PyTorch CPU version only
-torch==2.5.1+cpu -f https://download.pytorch.org/whl/cpu
+torch==2.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
