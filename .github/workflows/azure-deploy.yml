@@ -33,7 +33,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 5 : Installation des dépendances pour les tests
       - name: Install Test Dependencies
@@ -41,21 +41,21 @@ jobs:
           source venv/bin/activate
           pip install -r requirements-test.txt
           pip install joblib scikit-learn
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 6 : Vérification des modèles et fichiers nécessaires
       - name: Verify Models
         run: |
           test -f models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
           test -d models/mlflow_model || (echo "MLflow model folder is missing!" && exit 1)
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 7 : Exécution des tests unitaires
       - name: Run Tests
         run: |
           source venv/bin/activate
           pytest tests/ --maxfail=5 --disable-warnings
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 8 : Nettoyage des fichiers temporaires
       - name: Clean Temporary Files
@@ -64,7 +64,7 @@ jobs:
           find . -name "*.pyc" -exec rm -rf {} +
           find . -name "*.pyo" -exec rm -rf {} +
           rm -rf venv
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 9 : Création d'un nouvel environnement virtuel pour le déploiement
       - name: Create Deployment Virtual Environment (antenv)
@@ -73,7 +73,7 @@ jobs:
           source antenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
-        working-directory: ./api_sentiment_analysis
+    
 
       # Étape 10 : Déploiement sur Azure App Service
       - name: Deploy to Azure App Service

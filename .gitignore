@@ -4,4 +4,4 @@ __pycache__
 resume_projet.md
 app/__pycache__
 /tests
-.gitgnore
+requirements_full.txt
