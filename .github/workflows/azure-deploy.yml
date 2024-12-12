@@ -39,7 +39,7 @@ jobs:
       - name: Install Dependencies
         run: |
           source venv/bin/activate
-          pip install -r requirements.txt
+          pip install -r requirements.txt[test]
           pip install joblib scikit-learn
         working-directory: ./api_sentiment_analysis
 
