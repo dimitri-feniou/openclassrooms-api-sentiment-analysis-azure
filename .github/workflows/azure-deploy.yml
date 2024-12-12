@@ -56,7 +56,13 @@ jobs:
           source venv/bin/activate
           pytest tests/ --maxfail=5 --disable-warnings
         working-directory: ./api_sentiment_analysis
-
+      - name: Clean Temporary Files
+        run: |
+          find . -name "__pycache__" -exec rm -rf {} +
+          find . -name "*.pyc" -exec rm -rf {} +
+          find . -name "*.pyo" -exec rm -rf {} +
+          rm -rf venv
+        working-directory: ./api_sentiment_analysis
       # Étape 8 : Déploiement sur Azure App Service
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
