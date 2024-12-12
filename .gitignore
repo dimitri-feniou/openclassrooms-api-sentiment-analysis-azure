@@ -3,5 +3,4 @@ __pycache__
 .vscode
 resume_projet.md
 app/__pycache__
-/tests
 requirements_full.txt
