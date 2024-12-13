@@ -8,71 +8,84 @@ on:
     branches:
       - main
 
-jobs:
-  test_and_deploy:
-    runs-on: ubuntu-latest
+env:
+  PYTHON_VERSION: "3.10"
+  AZURE_WEBAPP_NAME: "openclassrooms-sentiment-analysis-api"
 
+jobs:
+  test:
+    runs-on: ubuntu-latest
     steps:
-      # Étape 1 : Checkout du code source
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Étape 2 : Liste des fichiers pour vérification
-      - name: List Repository Files
-        run: ls -al
-
-      # Étape 3 : Configuration de Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      # Étape 4 : Création et activation d'un environnement virtuel pour les tests
-      - name: Create Virtual Environment for Tests
+      - name: Create and activate test environment
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
+          python -m venv .venv-test
+          source .venv-test/bin/activate
+          python -m pip install --upgrade pip
 
-      # Étape 5 : Installation des dépendances pour les tests
-      - name: Install Test Dependencies
+      - name: Install test dependencies
         run: |
-          source venv/bin/activate
+          source .venv-test/bin/activate
           pip install -r requirements-test.txt
-          pip install joblib scikit-learn
 
-      # Étape 6 : Vérification des modèles et fichiers nécessaires
-      - name: Verify Models
-        run: |
-          test -f models/pca_model.pkl || (echo "PCA model file is missing!" && exit 1)
-          test -d models/mlflow_model || (echo "MLflow model folder is missing!" && exit 1)
-
-      # Étape 7 : Exécution des tests unitaires
       - name: Run Tests
         run: |
-          source venv/bin/activate
-          pytest tests/ --maxfail=5 --disable-warnings
+          source .venv-test/bin/activate
+          python -m pytest tests/ -v
 
-      # Étape 8 : Nettoyage des fichiers temporaires
-      - name: Clean Temporary Files
+      - name: Cleanup test environment
         run: |
-          find . -name "__pycache__" -exec rm -rf {} +
-          find . -name "*.pyc" -exec rm -rf {} +
-          find . -name "*.pyo" -exec rm -rf {} +
+          deactivate
+          rm -rf .venv-test
 
-      # Étape 9 : Création d'un nouvel environnement virtuel pour le déploiement
-      - name: Create Deployment Virtual Environment (antenv)
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Create deployment directory
         run: |
+          mkdir deploy
+          cp -r app models run.py requirements.txt  runtime.txt deploy/
+          cd deploy
           python -m venv antenv
           source antenv/bin/activate
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Étape 10 : Déploiement sur Azure App Service
+      - name: Clean and prepare files
+        run: |
+          cd deploy
+          find . -type d -name "__pycache__" -exec rm -rf {} +
+          find . -type f -name "*.pyc" -delete
+          find . -type f -name "*.pyo" -delete
+          find . -type d -name ".pytest_cache" -exec rm -rf {} +
+          find . -type d -name "__pycache__" -exec rm -rf {} +
+
+      - name: Create deployment package
+        run: |
+          cd deploy
+          zip -r ../app_deployment.zip ./*
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "openclassrooms-sentiment-analysis-api"
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-
+          package: app_deployment.zip

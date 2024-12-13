@@ -1,6 +1,5 @@
 import mlflow
-from transformers import DistilBertTokenizer, DistilBertModel
-import torch
+from transformers import DistilBertTokenizer, TFDistilBertModel
 from app.config import MODEL_URI
 from app.config import PCA_PATH
 import joblib
@@ -16,9 +15,7 @@ def load_model():
     """
     distilbert_model_name = "distilbert-base-uncased"
     tokenizer = DistilBertTokenizer.from_pretrained(distilbert_model_name)
-    distilbert_model = DistilBertModel.from_pretrained(distilbert_model_name).to(
-        "cuda" if torch.cuda.is_available() else "cpu"
-    )
+    distilbert_model = TFDistilBertModel.from_pretrained(distilbert_model_name)
     mlflow_model = mlflow.sklearn.load_model(model_uri
     )  
     pca_model = joblib.load(pca_path)
