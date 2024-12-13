@@ -42,7 +42,6 @@ jobs:
 
       - name: Cleanup test environment
         run: |
-          deactivate
           rm -rf .venv-test
 
   deploy:
