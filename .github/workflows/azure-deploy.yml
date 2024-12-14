@@ -61,11 +61,6 @@ jobs:
         run: |
           mkdir deploy
           cp -r app models run.py requirements.txt runtime.txt deploy/
-          cd deploy
-          python -m venv antenv
-          source antenv/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
 
       - name: Clean and prepare files
         run: |
