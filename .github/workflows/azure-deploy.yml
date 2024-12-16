@@ -60,7 +60,7 @@ jobs:
       - name: Create deployment directory
         run: |
           mkdir deploy
-          cp -r app models run.py requirements.txt runtime.txt deploy/
+          cp -r app models run.py requirements.txt runtime.txt startup.sh deploy/
 
       - name: Clean and prepare files
         run: |
