@@ -54,7 +54,7 @@ def home():
                 text, tokenizer, distilbert_model, mlflow_model, pca_model
             )
             sentiment_label = "positif" if sentiment == 1 else "negatif"
-            return render_template("index.html", text=text, sentiment=sentiment_label)
+            return render_template("index.html", text=text, sentiment=sentiment_label,predicted_sentiment=sentiment_label)
         except Exception as e:
             print(f"Error during prediction: {e}")
             return render_template(
@@ -65,7 +65,26 @@ def home():
 
 @api.route("/feedback", methods=["POST"])
 def feedback():
-    feedback = request.form.get("feedback")  # 'like' or 'dislike'
-    text = request.form.get("text")  # The analyzed text
-    print(f"Feedback received: {feedback} for text: {text}")
+    feedback = request.form.get("feedback")  # 'like' ou 'dislike'
+    text = request.form.get("text")          # text to predic
+    predicted_sentiment = request.form.get("predicted_sentiment")  # predict sentiment
+    # Debug print result from form
+    print(f"Feedback reçu : {feedback}")
+    print(f"Texte : {text}")
+    print(f"Sentiment prédit : {predicted_sentiment}")
+
+    # save the telemetry azure app insigth
+    from applicationinsights import TelemetryClient
+    tc = TelemetryClient('e0a1e652-439b-440b-a8bd-c6996203174b')
+    tc.track_event(
+        'FeedbackReceived',
+        properties={
+            'feedback': feedback,
+            'text': text,
+            'predicted_sentiment': predicted_sentiment
+        }
+    )
+    tc.flush()
+
     return redirect("/")
+
